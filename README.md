@@ -1,84 +1,19 @@
-\# AI Meeting Notes Assistant
+﻿# AI Meeting Notes Assistant
 
+i made this project for my assignment. its a web app where you can put your rough meeting notes and it will convert them into proper summary with action items and who has to do what.
 
+## Architecture
 
-A simple tool that takes rough meeting notes and converts them into proper structured action items using AI.
+the app has two parts. frontend made in react which is what user sees and backend made in node and express which does all the processing. when user fills the form and clicks generate summary, react sends the data to express backend. if user uploaded a audio file then whisper api first converts it to text. then backend sends the notes to groq ai model with a prompt. ai gives back summary, tags and action items in json format. we then save it in sqlite database. history page shows all the previous meetings fetched from database.
 
+## Why Stack Chosen
 
+i used react for frontend bcz i was already familiar with it and its easy to make ui with components. for backend i used node and express bcz its simple to make routes and its same language as frontend so no switching. for database i used sqlite bcz it doesnt need any setup, it just saves everything in one file which is good for a small project like this. for ai i used groq api bcz its completly free and very fast. for audio i used groq whisper which is also free and converts speech to text.
 
-\## Architecture
+## Tradeoffs
 
+sqlite is good for small project but if there are many users it wont work well, in that case postgres would be better. right now there is no login so anyone can see all meetings. if audio file is very large it can slow down the server bcz we process it one at a time. groq free tier has some limits so for big production app paid tier would be needed.
 
+## What I Would Improve
 
-React Frontend → Node/Express Backend → Groq AI API → SQLite Database
-
-
-
-\- user fills the meeting title, participants and raw notes in the react form
-
-\- frontend sends a POST request to the express backend on port 5000
-
-\- if audio file is uploaded, whisper api first converts it to text
-
-\- backend then sends the notes to groq llama ai with a proper prompt
-
-\- ai returns the summary and action items in json format
-
-\- we save everything in sqlite database
-
-\- history page fetches all the saved meetings and shows them
-
-
-
-\## Why Stack Chosen
-
-
-
-| Tool | Reason |
-
-|---|---|
-
-| React | easy to build ui with components, we already knew it |
-
-| Node/Express | simple to setup routes and api, same language as frontend so no context switching |
-
-| SQLite | no extra setup needed, its just a file, perfect for a mvp like this |
-
-| Groq API | completly free, very fast response, good quality output |
-
-| Groq Whisper | free speech to text, no need to setup anything extra |
-
-
-
-\## Tradeoffs
-
-
-
-\- sqlite is good for mvp but wont scale for production, in real app we would use postgres or mysql
-
-\- there is no authentication right now so anyone can see all the meeting history
-
-\- audio processing is synchronous so if file is very large it can slow down the server
-
-\- groq free tier has rate limits so for production use we would need paid tier
-
-
-
-\## What I Would Improve
-
-
-
-\- add user login so every user can only see their own meetings
-
-\- switch to postgres for better performance and scalability  
-
-\- add search feature so user can search meetings by keyword or date
-
-\- deploy frontend on vercel and backend on render so anyone can access it
-
-\- add option to export meeting summary as pdf or send on email
-
-\- better error messages when ai is not able to understand the notes properly
-
-\- make it more mobile friendly with better responsive design
-
+if i get more time i would add user login so each user sees only their meetings. i would also switch to postgres database for better performance. would add a search bar to find old meetings by keyword. would deploy it on vercel and render so anyone can use it without running locally. would also add option to download summary as pdf.
