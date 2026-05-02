@@ -18,14 +18,16 @@ app.post("/summarize", upload.single("audio"), async (req, res) => {
     let { title, notes, participants } = req.body;
 
     if (req.file) {
-      const audioStream = fs.createReadStream(req.file.path);
+      const ext = req.file.originalname.split(".").pop();
+      const newPath = req.file.path + "." + ext;
+      fs.renameSync(req.file.path, newPath);
+      const audioStream = fs.createReadStream(newPath);
       const transcription = await groq.audio.transcriptions.create({
         file: audioStream,
         model: "whisper-large-v3",
-        filename: req.file.originalname,
       });
       notes = transcription.text;
-      fs.unlinkSync(req.file.path);
+      fs.unlinkSync(newPath);
     }
 
     if (!notes) {
