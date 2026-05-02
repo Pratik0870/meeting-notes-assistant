@@ -5,22 +5,18 @@ const Groq = require("groq-sdk");
 const db = require("./database");
 const multer = require("multer");
 const fs = require("fs");
-const path = require("path");
 
 const app = express();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const upload = multer({ dest: "uploads/" });
 
 app.use(cors());
 app.use(express.json());
 
-// POST /summarize
 app.post("/summarize", upload.single("audio"), async (req, res) => {
   try {
     let { title, notes, participants } = req.body;
 
-    // If audio file uploaded, convert to text first
     if (req.file) {
       const audioStream = fs.createReadStream(req.file.path);
       const transcription = await groq.audio.transcriptions.create({
@@ -45,6 +41,7 @@ Raw Notes: ${notes}
 Return ONLY this JSON format, no extra text:
 {
   "summary": "2-3 sentence summary",
+  "tags": ["tag1", "tag2", "tag3"],
   "action_items": [
     {
       "task": "task description",
@@ -64,8 +61,8 @@ Return ONLY this JSON format, no extra text:
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const result = JSON.parse(cleaned);
 
-    db.prepare("INSERT INTO meetings (title, participants, raw_notes, summary, action_items) VALUES (?, ?, ?, ?, ?)")
-      .run(title, participants, notes, result.summary, JSON.stringify(result.action_items));
+    db.prepare("INSERT INTO meetings (title, participants, raw_notes, summary, tags, action_items) VALUES (?, ?, ?, ?, ?, ?)")
+      .run(title, participants, notes, result.summary, JSON.stringify(result.tags), JSON.stringify(result.action_items));
 
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
@@ -74,12 +71,12 @@ Return ONLY this JSON format, no extra text:
   }
 });
 
-// GET /history
 app.get("/history", (req, res) => {
   try {
     const meetings = db.prepare("SELECT * FROM meetings ORDER BY created_at DESC").all();
     const formatted = meetings.map((m) => ({
       ...m,
+      tags: JSON.parse(m.tags),
       action_items: JSON.parse(m.action_items),
     }));
     return res.status(200).json({ success: true, data: formatted });

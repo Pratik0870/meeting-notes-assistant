@@ -8,6 +8,7 @@ db.exec(`
     participants TEXT,
     raw_notes TEXT,
     summary TEXT,
+    tags TEXT,
     action_items TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
