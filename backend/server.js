@@ -3,26 +3,46 @@ const express = require("express");
 const cors = require("cors");
 const Groq = require("groq-sdk");
 const db = require("./database");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const upload = multer({ dest: "uploads/" });
 
 app.use(cors());
 app.use(express.json());
 
 // POST /summarize
-app.post("/summarize", async (req, res) => {
+app.post("/summarize", upload.single("audio"), async (req, res) => {
   try {
-    const { title, notes, participants } = req.body;
+    let { title, notes, participants } = req.body;
 
-    const prompt = `
-You are an AI meeting assistant. Analyze these meeting notes and return a JSON response.
+    // If audio file uploaded, convert to text first
+    if (req.file) {
+      const audioStream = fs.createReadStream(req.file.path);
+      const transcription = await groq.audio.transcriptions.create({
+        file: audioStream,
+        model: "whisper-large-v3",
+        filename: req.file.originalname,
+      });
+      notes = transcription.text;
+      fs.unlinkSync(req.file.path);
+    }
+
+    if (!notes) {
+      return res.status(400).json({ success: false, message: "No notes or audio provided" });
+    }
+
+    const prompt = `You are an AI meeting assistant. Analyze these meeting notes and return a JSON response.
 
 Meeting Title: ${title}
 Participants: ${participants}
 Raw Notes: ${notes}
 
-Return ONLY this JSON format:
+Return ONLY this JSON format, no extra text:
 {
   "summary": "2-3 sentence summary",
   "action_items": [
@@ -44,17 +64,8 @@ Return ONLY this JSON format:
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const result = JSON.parse(cleaned);
 
-    // Save to database
-    db.prepare(`
-      INSERT INTO meetings (title, participants, raw_notes, summary, action_items)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      title,
-      participants,
-      notes,
-      result.summary,
-      JSON.stringify(result.action_items)
-    );
+    db.prepare("INSERT INTO meetings (title, participants, raw_notes, summary, action_items) VALUES (?, ?, ?, ?, ?)")
+      .run(title, participants, notes, result.summary, JSON.stringify(result.action_items));
 
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
