@@ -2,7 +2,7 @@
 
 
 
-A lightweight MVP that converts rough meeting notes into structured action items using AI.
+A simple tool that takes rough meeting notes and converts them into proper structured action items using AI.
 
 
 
@@ -10,23 +10,23 @@ A lightweight MVP that converts rough meeting notes into structured action items
 
 
 
-Frontend (React) → Backend (Node/Express) → Groq AI API → SQLite Database
+React Frontend → Node/Express Backend → Groq AI API → SQLite Database
 
 
 
-\- User fills meeting title, participants, and raw notes on React frontend
+\- user fills the meeting title, participants and raw notes in the react form
 
-\- Frontend sends POST request to Express backend
+\- frontend sends a POST request to the express backend on port 5000
 
-\- If audio uploaded, Whisper API converts it to text first
+\- if audio file is uploaded, whisper api first converts it to text
 
-\- Backend sends notes to Groq Llama AI with structured prompt
+\- backend then sends the notes to groq llama ai with a proper prompt
 
-\- AI returns summary and action items in JSON format
+\- ai returns the summary and action items in json format
 
-\- Data saved to SQLite database
+\- we save everything in sqlite database
 
-\- History page fetches all saved meetings from database
+\- history page fetches all the saved meetings and shows them
 
 
 
@@ -38,15 +38,15 @@ Frontend (React) → Backend (Node/Express) → Groq AI API → SQLite Database
 
 |---|---|
 
-| React | Component based, fast UI development, already familiar |
+| React | easy to build ui with components, we already knew it |
 
-| Node/Express | Lightweight, easy routing, same language as frontend |
+| Node/Express | simple to setup routes and api, same language as frontend so no context switching |
 
-| SQLite | No setup needed, file based, perfect for MVP |
+| SQLite | no extra setup needed, its just a file, perfect for a mvp like this |
 
-| Groq API | Completely free, fastest AI inference available |
+| Groq API | completly free, very fast response, good quality output |
 
-| Groq Whisper | Free speech to text, no extra setup needed |
+| Groq Whisper | free speech to text, no need to setup anything extra |
 
 
 
@@ -54,13 +54,13 @@ Frontend (React) → Backend (Node/Express) → Groq AI API → SQLite Database
 
 
 
-\- SQLite is great for MVP but wont scale for production — would use Postgres
+\- sqlite is good for mvp but wont scale for production, in real app we would use postgres or mysql
 
-\- No authentication — anyone can see all meeting history
+\- there is no authentication right now so anyone can see all the meeting history
 
-\- Audio processing is synchronous — large files could slow down the server
+\- audio processing is synchronous so if file is very large it can slow down the server
 
-\- Groq free tier has rate limits — paid tier needed for production use
+\- groq free tier has rate limits so for production use we would need paid tier
 
 
 
@@ -68,17 +68,17 @@ Frontend (React) → Backend (Node/Express) → Groq AI API → SQLite Database
 
 
 
-\- Add user authentication so each user sees only their own meetings
+\- add user login so every user can only see their own meetings
 
-\- Use Postgres database for better scalability
+\- switch to postgres for better performance and scalability  
 
-\- Add search functionality to find meetings by keyword
+\- add search feature so user can search meetings by keyword or date
 
-\- Deploy frontend on Vercel and backend on Render
+\- deploy frontend on vercel and backend on render so anyone can access it
 
-\- Add email export so users can share meeting summaries
+\- add option to export meeting summary as pdf or send on email
 
-\- Better error messages when AI fails to parse notes
+\- better error messages when ai is not able to understand the notes properly
 
-\- Add loading spinner and better mobile responsiveness
+\- make it more mobile friendly with better responsive design
 
