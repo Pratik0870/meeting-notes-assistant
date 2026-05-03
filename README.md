@@ -4,16 +4,35 @@ i made this project for my assignment. its a web app where you can put your roug
 
 ## Architecture
 
-the app has two parts. frontend made in react which is what user sees and backend made in node and express which does all the processing. when user fills the form and clicks generate summary, react sends the data to express backend. if user uploaded a audio file then whisper api first converts it to text. then backend sends the notes to groq ai model with a prompt. ai gives back summary, tags and action items in json format. we then save it in sqlite database. history page shows all the previous meetings fetched from database.
+React Frontend → Node/Express Backend → Groq AI API → SQLite Database
+
+- user fills meeting title, participants and raw notes in react form
+- frontend sends POST request to express backend on port 5000
+- if audio uploaded, whisper api converts it to text first
+- backend sends notes to groq llama ai with structured prompt
+- ai returns summary, tags and action items in json format
+- everything saved in sqlite database
+- history page fetches all saved meetings from database
 
 ## Why Stack Chosen
 
-i used react for frontend bcz i was already familiar with it and its easy to make ui with components. for backend i used node and express bcz its simple to make routes and its same language as frontend so no switching. for database i used sqlite bcz it doesnt need any setup, it just saves everything in one file which is good for a small project like this. for ai i used groq api bcz its completly free and very fast. for audio i used groq whisper which is also free and converts speech to text.
+- React - easy to build ui with components, already familiar with it
+- Node/Express - simple to setup routes and api, same language as frontend
+- SQLite - no setup needed, file based, perfect for mvp
+- Groq API - completely free, very fast, good quality output
+- Groq Whisper - free speech to text, no extra setup needed
 
 ## Tradeoffs
 
-sqlite is good for small project but if there are many users it wont work well, in that case postgres would be better. right now there is no login so anyone can see all meetings. if audio file is very large it can slow down the server bcz we process it one at a time. groq free tier has some limits so for big production app paid tier would be needed.
+- sqlite is good for small project but if there are many users it wont work well, postgres would be better
+- right now there is no login so anyone can see all meetings
+- if audio file is very large it can slow down the server
+- groq free tier has some limits so for big production app paid tier would be needed
 
 ## What I Would Improve
 
-if i get more time i would add user login so each user sees only their meetings. i would also switch to postgres database for better performance. would add a search bar to find old meetings by keyword. would deploy it on vercel and render so anyone can use it without running locally. would also add option to download summary as pdf.
+- add user login so each user sees only their meetings
+- switch to postgres database for better performance
+- add a search bar to find old meetings by keyword
+- deploy on vercel and render so anyone can use it without running locally
+- add option to download summary as pdf
